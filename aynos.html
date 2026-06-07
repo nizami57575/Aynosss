@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aynılın Ad Günü 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pink:#ff6eb4;--purple:#a259ff;--yellow:#ffe156;--mint:#5ef0c8;--orange:#ff9a3c;--bg:#0d0820;--card-bg:rgba(255,255,255,.06)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none;transition:background .5s}
+#cursor{position:fixed;width:28px;height:28px;border-radius:50%;background:var(--pink);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;transition:width .15s,height .15s,background .2s}
+#cursor-trail{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--purple);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.6}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.1;transform:scale(.6)}to{opacity:.9;transform:scale(1.2)}}
+.aurora{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.aurora-blob{position:absolute;border-radius:50%;filter:blur(80px);animation:auroraMove var(--am,12s) ease-in-out infinite alternate;opacity:.18}
+@keyframes auroraMove{0%{transform:translate(0,0) scale(1)}100%{transform:translate(var(--tx,40px),var(--ty,30px)) scale(1.2)}}
+.floaters{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.floater{position:absolute;bottom:-60px;animation:floatUp var(--fu,10s) var(--fd,0s) ease-in infinite;opacity:0}
+@keyframes floatUp{0%{bottom:-8%;opacity:.8;transform:rotate(0deg)}100%{bottom:108%;opacity:0;transform:rotate(360deg)}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:200}
+
+/* ── FIXED BUTTONS ── */
+.fab{position:fixed;z-index:500;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:50%;width:48px;height:48px;font-size:1.3rem;cursor:pointer;display:none;align-items:center;justify-content:center;transition:background .2s,transform .2s;backdrop-filter:blur(8px)}
+.fab:hover{transform:scale(1.12)}
+.fab.show{display:flex}
+#musicBtn{top:1rem;right:1rem}
+#musicBtn:hover{background:rgba(255,110,180,.3)}
+#themeBtn{top:1rem;right:4.5rem}
+#themeBtn:hover{background:rgba(162,89,255,.3)}
+#screenshotBtn{top:1rem;right:8rem}
+#screenshotBtn:hover{background:rgba(94,240,200,.3)}
+#shareBtn{top:1rem;left:1rem}
+#shareBtn:hover{background:rgba(255,154,60,.3)}
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--mint));z-index:999;transition:width .1s;display:none}
+#progress.show{display:block}
+#scrollTop{position:fixed;bottom:2rem;right:1.5rem;z-index:499;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:50%;width:46px;height:46px;font-size:1.3rem;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 20px #a259ff44;transition:transform .2s}
+#scrollTop.show{display:flex}
+#scrollTop:hover{transform:scale(1.1) translateY(-2px)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:6rem;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,10,60,.95);border:1px solid rgba(255,110,180,.3);border-radius:14px;padding:.8rem 1.6rem;color:#e8d8ff;font-weight:700;font-size:.95rem;z-index:600;opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── INTRO ── */
+#intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1a0a3d 0%,#0d0820 70%);transition:opacity .8s ease,transform .8s ease}
+#intro.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+.intro-msg{color:#fff;font-size:clamp(1rem,3vw,1.4rem);font-weight:700;margin-bottom:2rem;text-align:center;padding:0 1.5rem;opacity:0;animation:fadeUp .9s .3s forwards}
+.intro-msg span{color:var(--pink)}
+.open-btn{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:50px;padding:1rem 2.8rem;font-family:'Nunito',sans-serif;font-size:1.2rem;font-weight:900;cursor:pointer;box-shadow:0 0 30px #ff6eb488;opacity:0;animation:fadeUp .9s .7s forwards;transition:transform .2s,box-shadow .2s}
+.open-btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 50px #a259ffaa}
+.gift-icon{font-size:5rem;margin-bottom:1rem;opacity:0;animation:fadeUp .9s 0s forwards,bounce 2s 1s ease-in-out infinite}
+
+/* ── MAIN ── */
+#main{display:none;position:relative;z-index:1;min-height:100vh;padding-bottom:4rem}
+#main.visible{display:block}
+
+/* ── BIG CENTER TEXT ── */
+.center-msg{position:relative;text-align:center;padding:4.5rem 1.5rem 2rem}
+.big-text{font-family:'Pacifico',cursive;font-size:clamp(1.6rem,5.5vw,3.2rem);line-height:1.4;background:linear-gradient(120deg,#fff 0%,var(--pink) 40%,var(--yellow) 70%,var(--mint) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:bigTextGlow 3s ease-in-out infinite alternate}
+@keyframes bigTextGlow{from{filter:drop-shadow(0 0 10px #ff6eb433)}to{filter:drop-shadow(0 0 40px #ff6eb499)}}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:1rem 1.5rem 3rem;position:relative}
+.balloons{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
+.balloon{position:absolute;bottom:-10px;animation:rise var(--r,6s) var(--del,0s) ease-in infinite;opacity:.85}
+@keyframes rise{0%{bottom:-10%;opacity:.9}100%{bottom:110%;opacity:0}}
+.hero-name{font-family:'Pacifico',cursive;font-size:clamp(3rem,12vw,7rem);background:linear-gradient(135deg,var(--pink) 0%,var(--yellow) 50%,var(--mint) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite;background-size:200%}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+.hero-sub{color:var(--yellow);font-size:clamp(1.2rem,4vw,2rem);font-weight:900;margin-top:.4rem;letter-spacing:.05em}
+.hero-date{color:#bbb;font-size:1rem;margin-top:.4rem;letter-spacing:.1em}
+
+/* ── CAKE ── */
+.cake-section{display:flex;flex-direction:column;align-items:center;margin:1.5rem 0}
+.cake{font-size:clamp(5rem,15vw,9rem);animation:cakePop .6s cubic-bezier(.36,1.5,.5,1) both,candleGlow 1.5s ease-in-out infinite alternate;cursor:pointer;transition:transform .2s;user-select:none}
+.cake:hover{transform:scale(1.1) rotate(-5deg)}
+.cake:active{transform:scale(.9)}
+@keyframes cakePop{from{transform:scale(0) rotate(-10deg)}to{transform:scale(1) rotate(0deg)}}
+@keyframes candleGlow{from{filter:drop-shadow(0 0 15px #ffe15655)}to{filter:drop-shadow(0 0 40px #ffe156cc)}}
+.click-hint{color:rgba(255,255,255,.35);font-size:.8rem;margin-top:.3rem;letter-spacing:.1em;animation:pulse 2s ease-in-out infinite}
+.cake-counter{color:var(--yellow);font-weight:900;font-size:.9rem;margin-top:.2rem;opacity:0;transition:opacity .3s}
+.cake-counter.show{opacity:1}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:.7}}
+
+/* ── COUNTDOWN ── */
+.countdown-section{text-align:center;padding:1.5rem 1rem}
+.countdown-title{color:var(--purple);font-weight:900;font-size:1rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem}
+.countdown-boxes{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.cbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:1rem 1.4rem;min-width:80px;text-align:center;backdrop-filter:blur(8px);transition:transform .2s}
+.cbox:hover{transform:scale(1.08)}
+.cbox-num{font-family:'Pacifico',cursive;font-size:2.2rem;color:var(--yellow);line-height:1}
+.cbox-label{font-size:.7rem;color:#aaa;letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem}
+
+/* ── WISH ── */
+.wish-section{text-align:center;padding:2rem 1.5rem}
+.wish-title{color:var(--mint);font-weight:900;font-size:1rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.2rem}
+.wish-display{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:1.2rem 2rem;max-width:420px;margin:0 auto 1rem;min-height:80px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#e8d8ff;line-height:1.5;transition:all .4s;backdrop-filter:blur(8px)}
+.wish-btn{background:linear-gradient(135deg,var(--mint),var(--purple));color:#fff;border:none;border-radius:40px;padding:.8rem 2rem;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.wish-btn:hover{transform:translateY(-2px);box-shadow:0 0 20px #5ef0c855}
+
+/* ── COLOR PICKER ── */
+.color-section{text-align:center;padding:1rem 1.5rem}
+.color-title{color:#bbb;font-size:.85rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.8rem}
+.color-swatches{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap}
+.swatch{width:36px;height:36px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .2s,border-color .2s}
+.swatch:hover,.swatch.active{transform:scale(1.2);border-color:#fff}
+
+/* ── EMOJI RAIN ── */
+#emojiRainBtn{background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff;border:none;border-radius:40px;padding:.7rem 1.8rem;font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;cursor:pointer;transition:transform .2s,box-shadow .2s;display:block;margin:.5rem auto}
+#emojiRainBtn:hover{transform:translateY(-2px);box-shadow:0 0 20px #ff9a3c55}
+
+/* ── MEMORY BOARD ── */
+.memories-section{padding:2rem 1.5rem;text-align:center}
+.memories-title{color:var(--orange);font-weight:900;font-size:1rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.5rem}
+.memories-grid{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;max-width:700px;margin:0 auto}
+.mem-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1.2rem;flex:1 1 150px;max-width:180px;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s;backdrop-filter:blur(8px);opacity:0;transform:scale(.85)}
+.mem-card:hover{background:rgba(255,110,180,.12);transform:translateY(-5px) scale(1.06);box-shadow:0 8px 30px #ff6eb433}
+.mem-card .mem-emoji{font-size:2.5rem;margin-bottom:.5rem}
+.mem-card .mem-text{font-size:.85rem;color:#ddd;line-height:1.4}
+
+/* ── HEARTS ── */
+.hearts-container{position:fixed;inset:0;pointer-events:none;z-index:150;overflow:hidden}
+.fly-heart{position:absolute;font-size:1.8rem;pointer-events:none;animation:flyHeart 1.5s ease-out forwards}
+@keyframes flyHeart{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-120px) scale(.4)}}
+
+/* ── CARDS ── */
+.cards{display:flex;flex-wrap:wrap;gap:1.5rem;justify-content:center;padding:1rem 1.5rem;max-width:900px;margin:0 auto}
+.card{background:var(--card-bg);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:1.8rem 2rem;flex:1 1 240px;max-width:300px;text-align:center;backdrop-filter:blur(10px);opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s,box-shadow .3s}
+.card.visible{opacity:1;transform:translateY(0)}
+.card:hover{box-shadow:0 8px 40px #a259ff44;transform:translateY(-6px) scale(1.02)}
+.card-icon{font-size:2.8rem;margin-bottom:.6rem}
+.card-title{color:var(--pink);font-weight:900;font-size:1.1rem;margin-bottom:.4rem}
+.card-text{color:#ccc;font-size:.95rem;line-height:1.5}
+
+/* ── QUIZ ── */
+.quiz-section{max-width:560px;margin:2rem auto;padding:0 1.5rem;text-align:center}
+.quiz-title{color:var(--yellow);font-weight:900;font-size:1rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.2rem}
+.quiz-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:24px;padding:2rem;backdrop-filter:blur(8px)}
+.quiz-q{color:#e8d8ff;font-size:1.1rem;font-weight:700;margin-bottom:1.2rem;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:.7rem}
+.quiz-opt{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:.8rem 1rem;color:#ddd;cursor:pointer;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:600;transition:background .2s,transform .1s}
+.quiz-opt:hover{background:rgba(162,89,255,.2);transform:scale(1.02)}
+.quiz-opt.correct{background:rgba(94,240,200,.2);border-color:var(--mint);color:var(--mint)}
+.quiz-opt.wrong{background:rgba(255,80,80,.15);border-color:#ff5050;color:#ff8080}
+.quiz-result{margin-top:1rem;font-weight:900;font-size:1.1rem;min-height:1.5rem}
+
+/* ── SPIN WHEEL ── */
+.spin-section{text-align:center;padding:2rem 1.5rem}
+.spin-title{color:var(--pink);font-weight:900;font-size:1rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem}
+.wheel-wrap{position:relative;width:220px;height:220px;margin:0 auto 1rem}
+#spinCanvas{border-radius:50%;cursor:pointer;box-shadow:0 0 40px #a259ff44;transition:box-shadow .3s}
+#spinCanvas:hover{box-shadow:0 0 60px #ff6eb466}
+.wheel-pointer{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:1.8rem;line-height:1}
+.spin-btn{background:linear-gradient(135deg,var(--pink),var(--orange));color:#fff;border:none;border-radius:40px;padding:.8rem 2rem;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.spin-btn:hover{transform:translateY(-2px);box-shadow:0 0 20px #ff6eb455}
+.spin-result{margin-top:.8rem;color:var(--yellow);font-weight:900;font-size:1.1rem;min-height:1.5rem}
+
+/* ── GALLERY / PHOTO WALL ── */
+.gallery-section{padding:2rem 1.5rem;text-align:center}
+.gallery-title{color:var(--mint);font-weight:900;font-size:1rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.2rem}
+.photo-grid{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;max-width:700px;margin:0 auto}
+.photo-frame{width:100px;height:100px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2.8rem;cursor:pointer;transition:transform .2s,box-shadow .2s;border:2px solid rgba(255,255,255,.15)}
+.photo-frame:hover{transform:rotate(3deg) scale(1.1);box-shadow:0 8px 30px #ff6eb433}
+
+/* ── LETTER ── */
+.letter-section{max-width:600px;margin:2rem auto;padding:0 1.5rem}
+.letter-box{background:linear-gradient(135deg,rgba(255,110,180,.08),rgba(162,89,255,.1));border:1px solid rgba(255,110,180,.2);border-radius:24px;padding:2rem;backdrop-filter:blur(8px);position:relative;overflow:hidden}
+.letter-box::before{content:'💌';position:absolute;top:-10px;right:20px;font-size:3rem;opacity:.2}
+.letter-title{color:var(--pink);font-weight:900;font-size:1rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem;text-align:center}
+.letter-text{color:#ddd;line-height:1.9;font-size:.98rem}
+.letter-text p{margin-bottom:.8rem}
+
+/* ── MESSAGE ── */
+.message-box{max-width:640px;margin:3rem auto 1rem;background:linear-gradient(135deg,rgba(162,89,255,.15),rgba(255,110,180,.12));border:1px solid rgba(255,110,180,.25);border-radius:28px;padding:2.5rem 2rem;text-align:center;box-shadow:0 0 60px #a259ff22;opacity:0;transform:scale(.95);transition:opacity .8s,transform .8s}
+.message-box.visible{opacity:1;transform:scale(1)}
+.message-box p{color:#e8d8ff;font-size:clamp(1rem,2.5vw,1.2rem);line-height:1.8;font-weight:600}
+.message-box .from{margin-top:1.2rem;color:var(--yellow);font-family:'Pacifico',cursive;font-size:1.3rem}
+
+/* ── SPARKLE ── */
+.sparkle{position:fixed;pointer-events:none;z-index:9997;border-radius:50%;animation:sparkleFade .8s ease-out forwards}
+@keyframes sparkleFade{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0)}}
+.firework-particle{position:fixed;pointer-events:none;z-index:201;border-radius:50%;animation:fwFly var(--ft,.8s) ease-out forwards}
+@keyframes fwFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--fx,0px),var(--fy,0px)) scale(.2)}}
+
+/* ── FOOTER ── */
+.footer{text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.25);font-size:.85rem}
+
+/* ── LIGHT MODE ── */
+body.light{--bg:#fff5fb;background:#fff5fb;--card-bg:rgba(0,0,0,.04)}
+body.light .card-text{color:#444}
+body.light .card{border-color:rgba(0,0,0,.1);background:rgba(255,255,255,.8)}
+body.light .message-box p{color:#333}
+body.light .footer{color:rgba(0,0,0,.3)}
+body.light .cbox{background:rgba(255,255,255,.8);border-color:rgba(0,0,0,.1)}
+body.light .wish-display,.body.light .quiz-box{background:rgba(255,255,255,.8);color:#333}
+body.light .mem-card{background:rgba(255,255,255,.8)}
+body.light .mem-text,.body.light .quiz-q,.body.light .quiz-opt{color:#333}
+body.light .letter-box{background:rgba(255,240,250,.9)}
+body.light .letter-text{color:#333}
+body.light .hero-date{color:#666}
+body.light #toast{background:rgba(255,240,250,.97);color:#333}
+
+/* ── ANIMATIONS ── */
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(5deg)}}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="aurora" id="aurora"></div>
+<div class="floaters" id="floaters"></div>
+<canvas id="confetti"></canvas>
+<div class="hearts-container" id="heartsContainer"></div>
+<div id="cursor">✨</div>
+<div id="cursor-trail"></div>
+<div id="progress"></div>
+<div id="toast"></div>
+
+<button id="musicBtn" class="fab" onclick="toggleMusic()" title="Musiqi">🎵</button>
+<button id="themeBtn" class="fab" onclick="toggleTheme()" title="Tema">🌙</button>
+<button id="screenshotBtn" class="fab" onclick="showToast('📸 Ekran görüntüsünü yükləmək üçün Ctrl+P istifadə et!')" title="Saxla">📸</button>
+<button id="shareBtn" class="fab" onclick="sharePage()" title="Paylaş">🔗</button>
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">☝️</button>
+
+<div id="intro">
+  <div class="gift-icon">🎁</div>
+  <p class="intro-msg">Bu səni gözləyən xüsusi bir <span>sürprizdir</span>…</p>
+  <button class="open-btn" onclick="openSurprise()">🎉 Sürprizi Aç!</button>
+</div>
+
+<div id="main">
+
+  <div class="center-msg">
+    <div class="big-text" id="bigText">Ad günün mübarək,<br>mənim ən sevimli qohumumum! 🌸💜</div>
+  </div>
+
+  <section class="hero">
+    <div class="balloons" id="balloons"></div>
+    <div class="hero-name" id="heroName">Aynıl!</div>
+    <div class="hero-sub">🎂 Mübarək Ad Günün! 🎂</div>
+    <div class="hero-date">8 İyun · 12 Yaş</div>
+  </section>
+
+  <div class="cake-section">
+    <div class="cake" id="cake" onclick="cakeClick()">🎂</div>
+    <p class="click-hint">👆 Torta klikle!</p>
+    <div class="cake-counter" id="cakeCounter">0 dəfə kliklədin 🎂</div>
+  </div>
+
+  <div class="countdown-section">
+    <div class="countdown-title">🗓️ Ad Günündən Keçən Vaxt</div>
+    <div class="countdown-boxes">
+      <div class="cbox"><div class="cbox-num" id="cd-d">00</div><div class="cbox-label">Gün</div></div>
+      <div class="cbox"><div class="cbox-num" id="cd-h">00</div><div class="cbox-label">Saat</div></div>
+      <div class="cbox"><div class="cbox-num" id="cd-m">00</div><div class="cbox-label">Dəq</div></div>
+      <div class="cbox"><div class="cbox-num" id="cd-s">00</div><div class="cbox-label">San</div></div>
+    </div>
+  </div>
+
+  <div class="color-section">
+    <div class="color-title">🎨 Rəng Seç</div>
+    <div class="color-swatches" id="swatches"></div>
+  </div>
+
+  <div class="wish-section">
+    <div class="wish-title">🌠 Sənin üçün arzu</div>
+    <div class="wish-display" id="wishDisplay">Düyməyə bas, sənə xüsusi bir arzu gəlsin ✨</div>
+    <button class="wish-btn" onclick="newWish()">🎲 Yeni Arzu!</button>
+  </div>
+
+  <div class="spin-section">
+    <div class="spin-title">🎡 Fırla, Sürpriz Qazan!</div>
+    <div class="wheel-wrap">
+      <div class="wheel-pointer">⬇️</div>
+      <canvas id="spinCanvas" width="220" height="220"></canvas>
+    </div>
+    <button class="spin-btn" onclick="spinWheel()">🎰 Fırla!</button>
+    <div class="spin-result" id="spinResult"></div>
+  </div>
+
+  <div style="text-align:center;padding:.5rem">
+    <div style="color:#bbb;font-size:.85rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">🌧️ Emoji Yağışı</div>
+    <button id="emojiRainBtn" onclick="startEmojiRain()">🌸 Emoji Yağdır!</button>
+  </div>
+
+  <div class="memories-section">
+    <div class="memories-title">💫 Xüsusi Anlar</div>
+    <div class="memories-grid" id="memGrid"></div>
+  </div>
+
+  <div class="gallery-section">
+    <div class="gallery-title">🖼️ Şəkil Divarı</div>
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
+
+  <div class="cards" id="cards">
+    <div class="card">
+      <div class="card-icon">✨</div>
+      <div class="card-title">12 Yaş!</div>
+      <div class="card-text">Bu gün sən həyatının ən gözəl dövrlərindən birini yaşayırsan. Hər il özün ilə birlikdə dünya da daha gözəl olur!</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌟</div>
+      <div class="card-title">Arzuların Olsun</div>
+      <div class="card-text">Bu gün bütün arzuların qəlbindən keçsin. Həyat sənə ən gözəl hədiyyələri versin — sevinc, sağlıq və sevgi!</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎈</div>
+      <div class="card-title">Əsl Şənlik</div>
+      <div class="card-text">Ad günlər il boyu gözlənilən xüsusi anlardır. Bu günü ömrünün ən xoş xatirəsi et!</div>
+    </div>
+  </div>
+
+  <div class="quiz-section">
+    <div class="quiz-title">🧠 Mini Oyun</div>
+    <div class="quiz-box" id="quizBox"></div>
+  </div>
+
+  <div class="letter-section">
+    <div class="letter-box">
+      <div class="letter-title">💌 Nizamidən Məktub</div>
+      <div class="letter-text">
+        <p>Əziz Aynıl,</p>
+        <p>Sən bu dünyaya gəldiyin gündən hər şey daha rəngli oldu. Sənin gülüşün, enerjin və sevgin hamının ürəyini isidib.</p>
+        <p>12 yaşında artıq böyük bir qız olursan — amma mənim üçün həmişə o şirin, sevimli qohum olacaqsan. 💜</p>
+        <p>Uğurların daim bol olsun, arzuların həmişə qəlbindən keçsin. Hər addımında yanında olacağam!</p>
+        <p style="color:var(--yellow);font-weight:900">Canı, qohumum ad günün mübarək! 🌸</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="message-box" id="msgBox">
+    <p>Əziz <strong style="color:var(--pink)">Aynıl</strong>, 🌸<br><br>
+    Bu gün sənin xüsusi günündür! 12 yaşın mübarək olsun. Hər gün gülüşün əskik olmasın, hər addımın uğurlu olsun. Sən çox xüsusi birisindir — bunu heç unutma! 💜</p>
+    <div class="from">— Nizamidən sənə kiçik bir hədiyyə 🎁</div>
+  </div>
+
+  <div class="footer">🎉 8 İyun · Ad Günün Mübarək Aynıl! 🎉</div>
+</div>
+
+<script>
+/* ═══════ 1. STARS ═══════ */
+const starsEl=document.getElementById('stars');
+for(let i=0;i<150;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*3+1;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+1).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
+  starsEl.appendChild(s);
+}
+
+/* ═══════ 2. AURORA ═══════ */
+const auroraEl=document.getElementById('aurora');
+[{c:'#a259ff',w:600,h:400,t:'10%',l:'5%',tx:'80px',ty:'50px',am:'14s'},{c:'#ff6eb4',w:500,h:350,t:'50%',l:'60%',tx:'-60px',ty:'40px',am:'18s'},{c:'#5ef0c8',w:400,h:300,t:'70%',l:'20%',tx:'50px',ty:'-60px',am:'11s'}].forEach(b=>{
+  const d=document.createElement('div');d.className='aurora-blob';
+  d.style.cssText=`width:${b.w}px;height:${b.h}px;background:${b.c};top:${b.t};left:${b.l};--tx:${b.tx};--ty:${b.ty};--am:${b.am}`;
+  auroraEl.appendChild(d);
+});
+
+/* ═══════ 3. FLOATERS ═══════ */
+const floatEl=document.getElementById('floaters');
+const fe=['🌸','💜','⭐','🎀','💛','🌺','🦋','🌈','💖','✨','🎊','🎈'];
+for(let i=0;i<30;i++){
+  const f=document.createElement('div');f.className='floater';
+  f.textContent=fe[Math.floor(Math.random()*fe.length)];
+  f.style.cssText=`left:${Math.random()*100}%;font-size:${(Math.random()*1.2+1).toFixed(1)}rem;--fu:${(Math.random()*8+7).toFixed(1)}s;--fd:${(Math.random()*10).toFixed(1)}s`;
+  floatEl.appendChild(f);
+}
+
+/* ═══════ 4. CURSOR + SPARKLE ═══════ */
+const cur=document.getElementById('cursor'),curT=document.getElementById('cursor-trail');
+let mx=0,my=0,trx=0,tryy=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+  spawnSparkle(mx,my);
+});
+setInterval(()=>{trx+=(mx-trx)*.15;tryy+=(my-tryy)*.15;curT.style.left=trx+'px';curT.style.top=tryy+'px';},16);
+document.addEventListener('mousedown',()=>{cur.style.width='16px';cur.style.height='16px'});
+document.addEventListener('mouseup',()=>{cur.style.width='28px';cur.style.height='28px'});
+function spawnSparkle(x,y){
+  if(Math.random()>.35)return;
+  const sp=document.createElement('div');sp.className='sparkle';
+  const sz=Math.random()*8+4;
+  const colors=['#ff6eb4','#a259ff','#ffe156','#5ef0c8','#fff'];
+  sp.style.cssText=`width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${x+Math.random()*20-10}px;top:${y+Math.random()*20-10}px;`;
+  document.body.appendChild(sp);setTimeout(()=>sp.remove(),800);
+}
+
+/* ═══════ 5. BALLOONS ═══════ */
+const bEmojis=['🎈','🎀','🎊','🎉','⭐','💜','💛','🌸','💖','🌺'];
+const ballEl=document.getElementById('balloons');
+for(let i=0;i<22;i++){
+  const b=document.createElement('div');b.className='balloon';
+  b.textContent=bEmojis[Math.floor(Math.random()*bEmojis.length)];
+  b.style.cssText=`left:${Math.random()*100}%;font-size:${(Math.random()*1.5+2).toFixed(1)}rem;--del:${(Math.random()*8).toFixed(1)}s;--r:${(Math.random()*5+5).toFixed(1)}s`;
+  ballEl.appendChild(b);
+}
+
+/* ═══════ 6. CONFETTI ═══════ */
+const canvas=document.getElementById('confetti'),ctx=canvas.getContext('2d');
+let pieces=[],confRunning=false;
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resizeCanvas();window.addEventListener('resize',resizeCanvas);
+function spawnConfetti(n=140,cx,cy){
+  const colors=['#ff6eb4','#a259ff','#ffe156','#5ef0c8','#ff9a3c','#ffffff','#ff5599'];
+  for(let i=0;i<n;i++){
+    pieces.push({x:cx??Math.random()*canvas.width,y:cy??-20,w:Math.random()*10+5,h:Math.random()*6+3,
+      color:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*360,
+      vx:(Math.random()-.5)*6,vy:cy?Math.random()*5+2:Math.random()*3+2,vr:(Math.random()-.5)*6,
+      alpha:1,shape:Math.random()>.5?'rect':'circle'});
+  }
+}
+function animateConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);pieces=pieces.filter(p=>p.alpha>.01);
+  for(const p of pieces){
+    p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.vy+=.06;
+    if(p.y>canvas.height*.75)p.alpha-=.014;
+    ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle=p.color;
+    if(p.shape==='circle'){ctx.beginPath();ctx.arc(0,0,p.w/2,0,Math.PI*2);ctx.fill();}
+    else ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    ctx.restore();
+  }
+  if(pieces.length>0||confRunning)requestAnimationFrame(animateConfetti);
+}
+
+/* ═══════ 7. FIREWORKS ═══════ */
+function launchFirework(x,y){
+  const colors=['#ff6eb4','#ffe156','#5ef0c8','#a259ff','#ff9a3c','#fff'];
+  for(let i=0;i<28;i++){
+    const p=document.createElement('div');p.className='firework-particle';
+    const angle=Math.random()*360,dist=Math.random()*130+60,rad=angle*Math.PI/180;
+    const sz=Math.random()*8+4,dur=(Math.random()*.4+.6).toFixed(2);
+    p.style.cssText=`width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${x}px;top:${y}px;--fx:${Math.cos(rad)*dist}px;--fy:${Math.sin(rad)*dist}px;--ft:${dur}s`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),parseFloat(dur)*1000+100);
+  }
+}
+
+/* ═══════ 8. FLYING HEARTS ═══════ */
+document.addEventListener('click',e=>{
+  if(e.target.closest('#intro')||e.target.tagName==='BUTTON'||e.target.closest('button')||e.target.id==='cake')return;
+  const h=document.createElement('div');h.className='fly-heart';
+  const emojis=['💜','💛','🌸','💖','✨','⭐','🎀'];
+  h.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+  h.style.left=(e.clientX-15)+'px';h.style.top=(e.clientY-15)+'px';
+  document.getElementById('heartsContainer').appendChild(h);
+  setTimeout(()=>h.remove(),1500);
+});
+
+/* ═══════ 9. CAKE CLICK ═══════ */
+let cakeClicks=0;
+function cakeClick(){
+  cakeClicks++;
+  const cc=document.getElementById('cakeCounter');
+  cc.textContent=`${cakeClicks} dəfə kliklədin 🎂`;
+  cc.classList.add('show');
+  const cake=document.getElementById('cake');
+  cake.style.animation='none';void cake.offsetWidth;
+  cake.style.animation='cakePop .4s cubic-bezier(.36,1.5,.5,1) both,candleGlow 1.5s ease-in-out infinite alternate';
+  const rect=cake.getBoundingClientRect();
+  launchFirework(rect.left+rect.width/2,rect.top+rect.height/2);
+  spawnConfetti(50,rect.left+rect.width/2,rect.top+rect.height/2);
+  confRunning=true;animateConfetti();setTimeout(()=>{confRunning=false},1200);
+  if(cakeClicks===5)showToast('🎂 5 dəfə kliklədin! Bravo!');
+  if(cakeClicks===10)showToast('🔥 10 dəfə! Sən super insansan Aynıl!');
+}
+
+/* ═══════ 10. TOAST ═══════ */
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ═══════ 11. COUNTDOWN ═══════ */
+function updateCountdown(){
+  const now=new Date(),bday=new Date(now.getFullYear(),5,8);
+  if(now<bday)bday.setFullYear(bday.getFullYear()-1);
+  const diff=now-bday;
+  document.getElementById('cd-d').textContent=String(Math.floor(diff/86400000)).padStart(2,'0');
+  document.getElementById('cd-h').textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('cd-m').textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-s').textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+}
+setInterval(updateCountdown,1000);
+
+/* ═══════ 12. COLOR THEME PICKER ═══════ */
+const themes=[
+  {name:'Çəhrayı',pink:'#ff6eb4',purple:'#a259ff',yellow:'#ffe156',mint:'#5ef0c8',bg:'#0d0820'},
+  {name:'Göy',pink:'#60b4ff',purple:'#3470ff',yellow:'#ffe156',mint:'#5ef0c8',bg:'#020b1a'},
+  {name:'Yaşıl',pink:'#5ef0c8',purple:'#00c896',yellow:'#ffe156',mint:'#a0ffdc',bg:'#020d09'},
+  {name:'Qızılı',pink:'#ffb347',purple:'#ff7c2a',yellow:'#ffe156',mint:'#ffd700',bg:'#120800'},
+  {name:'Bənövşəyi',pink:'#d966ff',purple:'#7c3aed',yellow:'#f0e156',mint:'#c084fc',bg:'#0d0226'},
+];
+const swatchEl=document.getElementById('swatches');
+themes.forEach((th,i)=>{
+  const sw=document.createElement('div');sw.className='swatch'+(i===0?' active':'');
+  sw.style.background=`linear-gradient(135deg,${th.pink},${th.purple})`;
+  sw.title=th.name;
+  sw.onclick=()=>{
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+    sw.classList.add('active');
+    const r=document.documentElement.style;
+    r.setProperty('--pink',th.pink);r.setProperty('--purple',th.purple);
+    r.setProperty('--yellow',th.yellow);r.setProperty('--mint',th.mint);
+    document.body.style.background=th.bg;
+    showToast('🎨 Rəng dəyişdirildi!');
+  };
+  swatchEl.appendChild(sw);
+});
+
+/* ═══════ 13. WISH GENERATOR ═══════ */
+const wishes=['🌸 Həmişə gülümsə — çünki sənin gülüşün dünyaya işıq verir!','⭐ Ən böyük arzuların hamısı gerçəkləşsin!','🦋 Hər yeni gün sənə yeni sevinclər gətirsin!','💜 Sevdiyin hər şeydə uğurlu ol, Aynıl!','🌈 Həyatın əbədiyyən rəngarəng olsun!','🎯 Hər hədəfinə çat, hər yolun açıq olsun!','💛 Xoşbəxtlik həmişə sənin yanında olsun!','🌺 Gözəl qəlbin həmişə sevgi ilə dolsun!','🔮 Gələcəyin parıldayan ulduzlar ilə dolu olsun!','🎉 Hər günün bu gün kimi şən keçsin!'];
+let lastWish=-1;
+function newWish(){
+  let idx;do{idx=Math.floor(Math.random()*wishes.length)}while(idx===lastWish);
+  lastWish=idx;
+  const wd=document.getElementById('wishDisplay');
+  wd.style.opacity='0';wd.style.transform='scale(.95)';
+  setTimeout(()=>{wd.textContent=wishes[idx];wd.style.transition='opacity .4s,transform .4s';wd.style.opacity='1';wd.style.transform='scale(1)';},200);
+}
+
+/* ═══════ 14. SPIN WHEEL ═══════ */
+const spinPrizes=['🌸 Çiçək Arzusu!','🎂 Tort Dilimlər!','💜 Sonsuz Sevgi!','⭐ Ulduz Uğur!','🎁 Sürpriz Hədiyyə!','🦋 Azadlıq!','💛 Altın Xoşbəxtlik!','🌈 Rəngarəng Gün!'];
+const spinColors=['#ff6eb4','#a259ff','#ffe156','#5ef0c8','#ff9a3c','#d966ff','#60b4ff','#ff5599'];
+const spinC=document.getElementById('spinCanvas');
+const spinCtx=spinC.getContext('2d');
+let spinAngle=0,spinning=false;
+function drawWheel(angle){
+  const cx=110,cy=110,r=100,seg=spinPrizes.length,arc=Math.PI*2/seg;
+  spinCtx.clearRect(0,0,220,220);
+  for(let i=0;i<seg;i++){
+    spinCtx.beginPath();spinCtx.moveTo(cx,cy);
+    spinCtx.arc(cx,cy,r,angle+i*arc,angle+(i+1)*arc);
+    spinCtx.fillStyle=spinColors[i];spinCtx.fill();
+    spinCtx.strokeStyle='rgba(255,255,255,.3)';spinCtx.lineWidth=2;spinCtx.stroke();
+    spinCtx.save();spinCtx.translate(cx,cy);spinCtx.rotate(angle+(i+.5)*arc);
+    spinCtx.textAlign='right';spinCtx.font='bold 11px Nunito,sans-serif';
+    spinCtx.fillStyle='#fff';spinCtx.shadowColor='#0008';spinCtx.shadowBlur=4;
+    spinCtx.fillText(spinPrizes[i].split(' ')[0],r-8,4);
+    spinCtx.restore();
+  }
+  spinCtx.beginPath();spinCtx.arc(cx,cy,18,0,Math.PI*2);
+  spinCtx.fillStyle='#fff';spinCtx.fill();
+  spinCtx.fillStyle='#a259ff';spinCtx.font='bold 10px Nunito';spinCtx.textAlign='center';spinCtx.textBaseline='middle';
+  spinCtx.fillText('🎰',cx,cy);
+}
+drawWheel(0);
+function spinWheel(){
+  if(spinning)return;spinning=true;
+  document.getElementById('spinResult').textContent='';
+  const extra=Math.random()*360+720+360*3;
+  const dur=3000;const start=performance.now();
+  const startAngle=spinAngle;
+  function step(now){
+    const t=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-t,4);
+    spinAngle=startAngle+(extra*Math.PI/180)*ease;
+    drawWheel(spinAngle);
+    if(t<1){requestAnimationFrame(step);}
+    else{
+      spinning=false;
+      const seg=spinPrizes.length,arc=Math.PI*2/seg;
+      const norm=((Math.PI*1.5-spinAngle)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
+      const idx=Math.floor(norm/arc)%seg;
+      document.getElementById('spinResult').textContent='🎉 '+spinPrizes[idx];
+      launchFirework(spinC.getBoundingClientRect().left+110,spinC.getBoundingClientRect().top+110);
+      showToast('🎡 '+spinPrizes[idx]);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+/* ═══════ 15. EMOJI RAIN ═══════ */
+function startEmojiRain(){
+  const emojis=['🌸','💜','⭐','🎀','💛','🌺','🦋','🌈','💖','✨','🎊','🎈','🎂','🎁'];
+  let count=0;
+  const iv=setInterval(()=>{
+    for(let i=0;i<4;i++){
+      const el=document.createElement('div');el.className='floater';
+      el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.cssText=`left:${Math.random()*100}%;font-size:${(Math.random()*1.5+1.5).toFixed(1)}rem;--fu:3s;--fd:0s;position:fixed;bottom:-5%;z-index:300;pointer-events:none;animation:floatUp 3s ease-in forwards`;
+      document.body.appendChild(el);setTimeout(()=>el.remove(),3100);
+    }
+    count++;if(count>25)clearInterval(iv);
+  },120);
+  showToast('🌸 Emoji yağışı başladı!');
+}
+
+/* ═══════ 16. MEMORY BOARD ═══════ */
+const memData=[{e:'🎂',t:'İlk tortasını kəsdiyin gün'},{e:'🌸',t:'Bahar parkda gəzintimiz'},{e:'🎮',t:'Oyun gecələri'},{e:'😂',t:'Unutulmaz gülüşlər'},{e:'🎨',t:'Yaradıcı anlar'},{e:'⭐',t:'Sənin parlayan günün'}];
+const memGrid=document.getElementById('memGrid');
+memData.forEach((m,i)=>{
+  const c=document.createElement('div');c.className='mem-card';
+  c.innerHTML=`<div class="mem-emoji">${m.e}</div><div class="mem-text">${m.t}</div>`;
+  c.style.transitionDelay=`${i*.1}s`;
+  c.onclick=()=>{
+    launchFirework(c.getBoundingClientRect().left+90,c.getBoundingClientRect().top+50);
+    c.style.animation='shake .5s ease';setTimeout(()=>c.style.animation='',500);
+  };
+  memGrid.appendChild(c);
+});
+
+/* ═══════ 17. PHOTO / EMOJI WALL ═══════ */
+const wallEmojis=['🌸','🦋','⭐','💜','🌈','🎂','🎈','🎁','🌺','💛','✨','🎊'];
+const pg=document.getElementById('photoGrid');
+const wallColors=['#ff6eb422','#a259ff22','#ffe15622','#5ef0c822','#ff9a3c22','#d966ff22'];
+wallEmojis.forEach((e,i)=>{
+  const f=document.createElement('div');f.className='photo-frame';
+  f.textContent=e;f.style.background=wallColors[i%wallColors.length];
+  f.onclick=()=>{
+    f.style.transform=`rotate(${Math.random()*20-10}deg) scale(1.15)`;
+    launchFirework(f.getBoundingClientRect().left+50,f.getBoundingClientRect().top+50);
+    setTimeout(()=>f.style.transform='',600);
+  };
+  pg.appendChild(f);
+});
+
+/* ═══════ 18. QUIZ ═══════ */
+const quizData=[{q:'Aynıl neçə yaşını qeyd edir?',opts:['10','11','12','13'],ans:2},{q:'Ad günü neçincidir?',opts:['5 İyun','8 İyun','10 İyun','12 İyun'],ans:1},{q:'Bu saytı kim hazırladı?',opts:['Aynıl','Nizami','Dostlar','Claude'],ans:1}];
+let qIdx=0,answered=false;
+function renderQuiz(){
+  const qb=document.getElementById('quizBox');
+  if(qIdx>=quizData.length){qb.innerHTML=`<div style="color:var(--mint);font-size:1.3rem;font-weight:900">🏆 Bravo! Hamısını bildın! 🎉</div>`;launchFirework(window.innerWidth/2,window.innerHeight/2);return;}
+  const q=quizData[qIdx];answered=false;
+  qb.innerHTML=`<div class="quiz-q">${q.q}</div><div class="quiz-options">${q.opts.map((o,i)=>`<button class="quiz-opt" onclick="answerQ(${i})">${o}</button>`).join('')}</div><div class="quiz-result" id="qr"></div>`;
+}
+function answerQ(i){
+  if(answered)return;answered=true;
+  const opts=document.querySelectorAll('.quiz-opt'),q=quizData[qIdx];
+  opts[i].classList.add(i===q.ans?'correct':'wrong');
+  if(i!==q.ans)opts[q.ans].classList.add('correct');
+  document.getElementById('qr').innerHTML=i===q.ans?`<span style="color:var(--mint)">✅ Doğrudur!</span>`:`<span style="color:#ff8080">❌ Yanlış! Cavab: ${q.opts[q.ans]}</span>`;
+  if(i===q.ans){launchFirework(window.innerWidth/2,300);showToast('✅ Doğru cavab!');}
+  setTimeout(()=>{qIdx++;renderQuiz();},1800);
+}
+
+/* ═══════ 19. SCROLL PROGRESS + SCROLL TOP ═══════ */
+window.addEventListener('scroll',()=>{
+  const st=window.scrollY,dh=document.documentElement.scrollHeight-window.innerHeight;
+  document.getElementById('progress').style.width=(st/dh*100)+'%';
+  document.getElementById('scrollTop').classList.toggle('show',st>300);
+  // parallax big text
+  const bt=document.getElementById('bigText');
+  if(bt)bt.style.transform=`translateY(${st*.15}px)`;
+});
+
+/* ═══════ 20. MUSIC ═══════ */
+let audioCtx=null,musicPlaying=false,musicTimeout=null;
+const notes=[261,261,293,261,349,329,261,261,293,261,392,349,261,261,523,440,349,329,293,494,494,440,349,392,349];
+const durs=[.4,.4,.8,.8,.8,1.6,.4,.4,.8,.8,.8,1.6,.4,.4,.8,.8,.8,.8,1.6,.4,.4,.8,.8,.8,1.6];
+let noteIdx=0;
+function playNote(freq,dur){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type='triangle';o.frequency.value=freq;
+  g.gain.setValueAtTime(.25,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur*.9);
+  o.start();o.stop(audioCtx.currentTime+dur);
+}
+function scheduleNext(){if(!musicPlaying)return;playNote(notes[noteIdx],durs[noteIdx]);const ms=durs[noteIdx]*1000;noteIdx=(noteIdx+1)%notes.length;musicTimeout=setTimeout(scheduleNext,ms);}
+function toggleMusic(){
+  const btn=document.getElementById('musicBtn');
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(musicPlaying){clearTimeout(musicTimeout);musicPlaying=false;btn.textContent='🎵';showToast('🔇 Musiqi dayandırıldı');}
+  else{musicPlaying=true;noteIdx=0;btn.textContent='🔇';scheduleNext();showToast('🎵 Musiqi başladı!');}
+}
+
+/* ═══════ 21. THEME TOGGLE ═══════ */
+let isLight=false;
+function toggleTheme(){
+  isLight=!isLight;
+  document.body.classList.toggle('light',isLight);
+  document.getElementById('themeBtn').textContent=isLight?'🌙':'☀️';
+  showToast(isLight?'☀️ Açıq tema':'🌙 Tünd tema');
+}
+
+/* ═══════ 22. SHARE ═══════ */
+function sharePage(){
+  if(navigator.share){navigator.share({title:'Aynılın Ad Günü!',text:'Ad günün mübarək Aynıl! 🎂',url:window.location.href}).catch(()=>{});}
+  else{navigator.clipboard.writeText(window.location.href).then(()=>showToast('🔗 Link kopyalandı!')).catch(()=>showToast('🔗 Linki yaxınlarınla paylaş!'));}
+}
+
+/* ═══════ 23. KEYBOARD EASTER EGG ═══════ */
+let keySeq='';
+document.addEventListener('keydown',e=>{
+  keySeq+=e.key.toLowerCase();if(keySeq.length>8)keySeq=keySeq.slice(-8);
+  if(keySeq.includes('aynil')){
+    for(let i=0;i<5;i++)setTimeout(()=>launchFirework(Math.random()*window.innerWidth,Math.random()*window.innerHeight/2),i*200);
+    spawnConfetti(300);confRunning=true;animateConfetti();setTimeout(()=>{confRunning=false},4000);
+    showToast('🎉 Gizli kod tapıldı! Aynıl yazdın!');keySeq='';
+  }
+});
+
+/* ═══════ 24. NAME SPARKLE on hover ═══════ */
+document.getElementById('heroName').addEventListener('mouseenter',()=>{
+  const el=document.getElementById('heroName');
+  const rect=el.getBoundingClientRect();
+  for(let i=0;i<12;i++){
+    setTimeout(()=>{
+      launchFirework(rect.left+Math.random()*rect.width,rect.top+Math.random()*rect.height);
+    },i*80);
+  }
+});
+
+/* ═══════ 25. TYPING EFFECT ═══════ */
+function typeText(el,text,speed=50){
+  el.innerHTML='';let i=0;
+  function t(){
+    if(i<text.length){
+      el.innerHTML=text.substring(0,i+1).replace(/<br>/g,'<br>');
+      i++;setTimeout(t,speed);
+    }
+  }t();
+}
+
+/* ═══════ 26. INTERSECTION OBSERVERS ═══════ */
+function observeAll(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*150);obs.unobserve(e.target);}});
+  },{threshold:.15});
+  document.querySelectorAll('.card').forEach(c=>obs.observe(c));
+  const msgObs=new IntersectionObserver(([e])=>{
+    if(e.isIntersecting){document.getElementById('msgBox').classList.add('visible');msgObs.unobserve(e.target);}
+  },{threshold:.2});
+  msgObs.observe(document.getElementById('msgBox'));
+  const memObs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='scale(1)';memObs.unobserve(e.target);}});
+  },{threshold:.1});
+  document.querySelectorAll('.mem-card').forEach(c=>memObs.observe(c));
+}
+
+/* ═══════ 27. OPEN SURPRISE ═══════ */
+function openSurprise(){
+  document.getElementById('intro').classList.add('hidden');
+  setTimeout(()=>{
+    document.getElementById('main').classList.add('visible');
+    ['musicBtn','themeBtn','screenshotBtn','shareBtn'].forEach(id=>document.getElementById(id).classList.add('show'));
+    document.getElementById('progress').classList.add('show');
+    confRunning=true;spawnConfetti(280);animateConfetti();
+    [1200,2500,4200].forEach(t=>setTimeout(()=>spawnConfetti(130),t));
+    setTimeout(()=>{confRunning=false},5500);
+    [.25,.75,.5].forEach((x,i)=>setTimeout(()=>launchFirework(window.innerWidth*x,180+i*20),400+i*500));
+    setTimeout(()=>typeText(document.getElementById('bigText'),'Ad günün mübarək,<br>mənim ən sevimli qohumumum! 🌸💜',55),600);
+    updateCountdown();renderQuiz();observeAll();newWish();drawWheel(0);
+    setTimeout(()=>showToast('🎉 Xoş gəldin Aynıl! Ad günün mübarək!'),1500);
+  },850);
+}
+</script>
+</body>
+</html>
